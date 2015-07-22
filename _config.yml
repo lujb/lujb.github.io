@@ -11,7 +11,7 @@ description: >
  子里面的水和小石子倒出来，把瓶子捡走了！
 baseurl: "" # the subpath of your site, e.g. /blog/
 url: "http://lujingbo.me" # the base hostname & protocol for your site
-twitter_username: lujingbo
+twitter_username: okbudao
 github_username:  lujb
 
 # Build settings
