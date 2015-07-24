@@ -2,13 +2,8 @@
 title: "#!/bin/env lujingbo"
 subtitle: "perception and cognition."
 email: i@lujingbo.me
-description: >
- 一个乌鸦想喝瓶子里面的水，但是水太少，
- 瓶子太高，最后乌鸦想到了一个好办法，
- 往瓶子里投掷小石子，经过一阵忙活后，
- 乌鸦终于能喝到瓶子里面的水了，可是
- 正准备喝时，一个老太太走过来，把瓶
- 子里面的水和小石子倒出来，把瓶子捡走了！
+permalink: /posts/:title.html
+description: "一个乌鸦想喝瓶子里面的水，但是水太少，瓶子太高，最后乌鸦想到了一个好办法，往瓶子里投掷小石子，经过一阵忙活后，乌鸦终于能喝到瓶子里面的水了，可是正准备喝时，一个老太太走过来，把瓶子里面的水和小石子倒出来，把瓶子捡走了！"
 baseurl: "" # the subpath of your site, e.g. /blog/
 url: "http://lujingbo.me" # the base hostname & protocol for your site
 twitter_username: okbudao

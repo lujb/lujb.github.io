@@ -32,8 +32,8 @@ Java等语言所使用的请求-响应(request-response)模型的区别或多或
 包含对应callback的消息到执行线程的消息队列中。在后续的某个时刻，这条消息
 被执行线程取出来并执行其中的callback函数。
 
-这种模型对于用户界面的开发者而言再熟悉不过了。诸如"鼠标按下",
-"点击"等事件可以在任意时刻被触发。这与在服务端应用中典型的同步，
+这种模型对于用户界面的开发者而言再熟悉不过了。诸如`鼠标按下`,
+`点击`等事件可以在任意时刻被触发。这与在服务端应用中典型的同步，
 请求-相应模型有很大的区别。
 
 我们来看一下这两种类型的区别。考虑HTTP请求www.google.com并输
@@ -49,13 +49,15 @@ puts 'Done!'
 1. 执行get方法，执行线程等待响应
 2. get方法接受到Google的响应，并返回给调用者，保存到response变量中
 3. 输出response变量到控制台
-4. 输出'Done!'到控制台
+4. 输出`Done!`到控制台
 
 而用JavaScript(Node.js)来实现:
 ```javascript
 request('http://www.google.com', function(error, response, body) {
-	console.log(body); }); console.log('Done!');
+    console.log(body); });
+console.log('Done!');
 ```
+
 有点不一样吧，并且结果有很大区别：
 
 1. 执行request函数，传递一个匿名函数作为回调
@@ -79,10 +81,10 @@ JavaScript的执行线程包含一个消息队列，用来存储将被处理的�
 
 ```javascript
 function init() {
-	var link = document.getElementById("foo");
-	link.addEventListener("click", function changeColor() {
-		this.style.color = "burlywook";
-	});
+    var link = document.getElementById("foo");
+    link.addEventListener("click", function changeColor() {
+        this.style.color = "burlywook";
+    });
 }
 ```
 
@@ -91,7 +93,7 @@ function init() {
 (从图中1开始看)回调函数的调用作为call stack上的初始帧。由于JavaScript执行引擎
 是单线程的，后续的消息提取和处理就会被暂停，直到当前stack上所有的调用都返回为止。
 
-在这个例子当中，当用户点击'foo'标签时，"onclick"事件被触发了，这时，一个消息(包含它的回调函数changeColor)被压入到了消息队列中了。当这条消息被取出时，它的
+在这个例子当中，当用户点击`foo`标签时，`onclick`事件被触发了，这时，一个消息(包含它的回调函数changeColor)被压入到了消息队列中了。当这条消息被取出时，它的
 回调函数changeColor将会被执行。当changeColor返回时(或抛出了error)，该消息
 处理完毕，事件循环才能取下一条消息来处理。
 
@@ -122,8 +124,8 @@ f();
 由于setTimeout函数的非阻塞特性，它的回调函数至少在未来0微秒后执行，并且在本次
 事件循环处理消息过程中不执行。在这个例子中，调用了setTimeout，并传递回调函数g
 以及0微秒的超时时间。当指定的超时时间满足以后(本例中几乎瞬时)，一个包含回调函数g
-的消息将会被压人消息队列。最终控制台将会依次显示："foo"，"baz"，"blix"。最后在
-下一次事件循环处理消息(tick)的时候，打印出"bar"来。如果在同一个调用帧中有两次调
+的消息将会被压人消息队列。最终控制台将会依次显示：`foo`，`baz`，`blix`。最后在
+下一次事件循环处理消息(tick)的时候，打印出`bar`来。如果在同一个调用帧中有两次调
 用setTimeout，且超时时间相同，那么这两个包含相应回调函数的异步消息将以调用的顺序
 进入消息队列中。
 
@@ -149,6 +151,7 @@ var reportResult = function(e) {
 
 onmessage = reportResult;
 ```
+
 接着看一下主线程的调用：
 ```javascript
 // our main code, in a `<script>` tag in our HTML page;
@@ -161,7 +164,7 @@ piWorker.addEventListener("message", logResult, false);
 piWorker.postMessage(100000);
 ```
 在这个例子中，主线程spawn出一个worker线程，并且为其注册logResult
-回调函数到"message"事件上。当worker线程接收到来自主线程的消息时，
+回调函数到`message`事件上。当worker线程接收到来自主线程的消息时，
 worker线程将消息及回调函数logResult绑定在一起压入自身的消息队列中。
 当worker消息从其消息队列取消息时，会向主线程回馈一个消息，同样绑定
 回调函数logResult。通过这种方式，开发者就可以将CPU密集型的任务代理给
