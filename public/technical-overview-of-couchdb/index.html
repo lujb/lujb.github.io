@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <meta name="description" content="2b or not 2b">
+  <meta name="keyword" content="lujingbo, lujb, javascript">
+  
+    <link rel="shortcut icon" href="/css/images/logo.png">
+  
+  <title>
+    
+      [译] CouchDB 技术概述 | #!/bin/env lujingbo
+    
+  </title>
+  <link href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href="//cdn.bootcss.com/nprogress/0.2.0/nprogress.min.css" rel="stylesheet">
+  <link href="//cdn.bootcss.com/highlight.js/9.12.0/styles/tomorrow.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+  <script src="//cdn.bootcss.com/geopattern/1.2.3/js/geopattern.min.js"></script>
+  <script src="//cdn.bootcss.com/nprogress/0.2.0/nprogress.min.js"></script>
+</head>
+<div class="wechat-share">
+  <img src="/css/images/logo.png" />
+</div>
+
+  <body>
+    <header class="header fixed-header">
+  <div class="header-container">
+    <a class="home-link" href="/">
+      <div class="logo"></div>
+      <span>#!/bin/env lujingbo</span>
+    </a>
+    <span class="header-title">[译] CouchDB 技术概述</span>
+    <ul class="right-list">
+      
+        <li class="list-item">
+          
+            <a href="/" class="item-link">Home</a>
+          
+        </li>
+      
+    </ul>
+    <div class="menu">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </div>
+    <div class="menu-mask">
+      <ul class="menu-list">
+        
+          <li class="menu-item">
+            
+              <a href="/" class="menu-link">Home</a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</header>
+
+    <div id="article-banner">
+  <h2>[译] CouchDB 技术概述</h2>
+</div>
+<main class="app-body flex-box">
+  <!-- Article START -->
+  <article class="post-article">
+    <section class="markdown-content"><p><a href="http://docs.couchdb.org/en/latest/intro/overview.html" target="_blank" rel="noopener">原文链接</a></p>
+<h2 id="Document-存储"><a href="#Document-存储" class="headerlink" title="Document 存储"></a>Document 存储</h2><p>一个 CouchDB 服务器管理一些有名字的数据库，这些数据库里存储着称为<br><code>documents</code>的东西。每个 document 在数据库中被有一个唯一的名字，同<br>时，CouchDB 提供了对其进行 reading 和 updating(add, edit, delete)<br>操作的<a href="http://en.wikipedia.org/wiki/REST" target="_blank" rel="noopener">RESTful</a><br><a href="http://docs.couchdb.org/en/latest/api/basics.html#api-basics" target="_blank" rel="noopener">HTTP API</a>。</p>
+<p>CouchDB 中数据的主要单元就是 document，它由任意数量的 field 和<br>attachment 组成。document 还包含一个由数据库系统维护的自身元数据<br>信息。document 的 field 是一些 name-value 对的集合，其中，name 是<br>唯一的，value 可以为<a href="htp://docs.couchdb.org/en/latest/api/basics.html#json" target="_blank" rel="noopener">各种类型</a>(text, number, boolean, list等)，并且它们都是没<br>有大小或数量限制的。</p>
+<p>CouchDB 的 document 更新模型是无锁的，乐观的。Document 的编辑流程<br>通常是客户端应用先加载 documents，再应用一些变化，最后保存回数据库。<br>如果在编辑的同时有另一个客户端先提交了保存，那么此时的修改会返回一<br>个编辑冲突的错误。解决这种更新冲突的办法是，不指定 document 的最终<br>版本，重新编辑提交一次。</p>
+<p>Document 的更新操作（add, edit, delete）要么成功，要么失败。数据库<br>是不会包含不完整的数据的。</p>
+<h2 id="ACID-特性"><a href="#ACID-特性" class="headerlink" title="ACID 特性"></a>ACID 特性</h2><p>CouchDB 文件布局和提交系统具备<code>Atomic Consistent Isolated Durable(ACID)</code>特性。在磁盘上，CouchDB绝不会覆盖已提交的数据或关联的结构，保证<br>数据库文件状态总是一致性的。这是一种 <code>crash-only</code> 设计，当有进程挂掉时，CouchDB 不会做任何处理，只是简单的死去。</p>
+<p>Document的更新（add, edit, delete）操作中，除了对<code>binary blobs</code> 数据<br>是并发写的，其它都是顺序的。数据库读操作是立即执行的，不会加锁，也不会等待其他任何写操作或读操作完成的。即使对于同一个 document，多个客<br>户端的读操作不会被加锁或者因并发更新而中断。CouchDB 的读操作使用了<br>一种称为<strong><a href="http://en.wikipedia.org/wiki/Multiversion_concurrency_control" target="_blank" rel="noopener">Multi-Version Concurrency Control</a></strong>的模型，它保证每个客户端<br>在读操作中，都可以获得数据库最新版本的一致性数据(see a consistent<br>snapshot of the database)。</p>
+<p>Document 被索引在由它们的名字（DocID）和一个序列号构成的 B-trees 中<br>。每一个更新都会产生一个新的序列号。序列号稍后被应用于数据库的增量<br>变化中。当 document 被保存或删除时，这些 B-tree 索引都会被更新。索<br>引的更新总是出现在索引文件的末尾（append-only更新）。</p>
+<p>在存储被适当包装的数据场景中，document 机制比在大多数数据库中把打<br>包的数据切分成多个表和行来存储更有优势。当 document 数据被存储到磁盘时，document 的字段和元数据信息就被打包进缓冲中，同时，document 被<br>顺序存放（方便后续高效地生成视图）。</p>
+<p>当 document 更新完成时，所有新的数据及关联的索引都会被刷入到磁盘，<br>同时，事务提交总是保证数据库处于完全一致的状态中。提交出现在以下两步中：</p>
+<ol>
+<li>所有的document数据及其索引的更新被同步刷入磁盘中。</li>
+<li>数据库header的更新分成两步。先用一致的数据块填充文件的前4k空间，然后同步刷入磁盘中。</li>
+</ol>
+<p>如果在第1步中OS崩溃或发生断电了，被刷入的部分更新在重启时会被丢弃。<br>如果这种情况发生在第2步当中（提交header），header的一份拷贝会被保留<br>，来保证之前已提交数据的一致性。在发生崩溃或断电后，只会对header部分做一致性检查或修复。</p>
+<h2 id="Compaction"><a href="#Compaction" class="headerlink" title="Compaction"></a>Compaction</h2><p>浪费的空间会在精简过程中被释放。当数据库文件浪费的空间超过一定值时<br>或者精简调度被触发，compaction 进程会复制数据库文件中的所有活跃数据<br>到一个新的数据库文件中，然后丢弃旧的数据库文件。在整个期间，数据库<br>的访问不会被中断。旧的数据库文件只会在当其所有的数据都被拷贝到新文件，并且用户的操作都过渡到新文件时才会被丢弃。</p>
+<h2 id="视图"><a href="#视图" class="headerlink" title="视图"></a>视图</h2><p>ACID 只能解决存储和更新的问题，但我们有时也需要按某种有用的方式来<br>展示数据。CouchDB 不像 SQL 数据库那样必须小心地把数据切分到不同的表<br>中，它会把数据存入半结构化的 documents中。CouchDB 的 document 是灵活的，并且它有一个隐式结构用来对付在表结构和数据的双向复制中<br>的大多数难题和陷阱。</p>
+<p>但是，仅仅一个简单的 document 模型是很不够的。我们更多的是想要通过很多种不同的方式对我们的数据进行分析。对于这种没有按分类切分到不同的表中的数据，我们需要一种过滤，组织，报告的方式。</p>
+<h3 id="视图模型"><a href="#视图模型" class="headerlink" title="视图模型"></a>视图模型</h3><p>为了解决给非结构化和半结构化的数据附加一种结构，CouchDB 集成了一种<br>视图模型。视图是一种给 documents 做汇总和报告的方法。因为视图是动态<br>构建的，并且不影响所依赖的 document，所以同一份数据可以有多种视图<br>表示。<br>视图的定义是完全虚拟的，并且只显示当前数据库实例的 documents，这就<br>使视图与它所显示的数据本身隔离开来，并且也可以被复制。CouchDB 的视<br>图被定义在一种特殊的<code>design documents</code>当中，并且也可以像普通的 documents那样被复制到不同的数据库实例当中。因此，在CouchDB中，不仅仅是数<br>据可以被复制，整个应用的设计也可以被复制。</p>
+<h3 id="Javascript-视图函数"><a href="#Javascript-视图函数" class="headerlink" title="Javascript 视图函数"></a>Javascript 视图函数</h3><p>视图的是通过在 map-reduce 系统中扮演map部分的 Javascript 函数来定义<br>的。一个视图函数接受一个 CouchDB document作为参数，然后经过一些计算<br>来决定这个数据是否是视图所需要的。可以给基于单 document 的视图添加<br>多行，或者一行都不添加。</p>
+<h3 id="视图索引"><a href="#视图索引" class="headerlink" title="视图索引"></a>视图索引</h3><p>视图是数据库真实 document 内容的一个动态表示，并且视图的创建也是非常容易的。为数据库中的大量 documents 生成一个视图是非常耗时的，所以系<br>统不会每次都从头做起。</p>
+<p>为了提高视图的查询效率，视图引擎维护了一些视图的索引，并且增量更新<br>它们以便反映数据库中的变化。CouchDB的核心设计是为效率的需要，大量<br>优化视图及其索引的增量创建。</p>
+<p>视图及视图函数被定义在特殊“设计”的 documents，这样的一个 document<br>包含了任意数量的视图函数。当一个用户使用一个视图时，视图的索引就会<br>自动更新。一个 design document 中的所有视图作为一个组来索引。</p>
+<p>视图构建器使用序列号来决定视图组是否全部更新了。如果不是，视图引擎<br>就会检查自上次刷新视图组后的全部 documents 变化（按数据打包序列顺<br>序）。Documents 按照它们在磁盘文件出现的顺序开始读，减少磁头寻道频<br>率。</p>
+<p>当视图被刷新时，仍然可以被同时读和查询。如果某个客户端从一个大视图<br>中很慢地获取数据时，视图仍然可以被其他的客户端使用和刷新，且不会阻塞<br>先前正在使用的客户端。视图索引刷新的同时，大量对视图的读和查询操作是不会有任何问题的。</p>
+<p>由于 documents 是被视图引擎调用用户定义的map/reduce函数来处理的，它<br>们先前的行将从视图索引中移除。当视图函数操作一个 document 时， 函数<br>返回结果将作为一个新的行被插入到视图中。</p>
+<p>视图索引的修改总是被写入到磁盘文件的末尾，来减少磁头寻道时间，以及保证在发生崩溃和断电时的写不会搞坏已有的索引。当崩溃发生在更新索引的过程中，未完成的索引修改将被简单的丢弃，并根据先前的提交状态重新构建索引增量。</p>
+<h2 id="安全和校验"><a href="#安全和校验" class="headerlink" title="安全和校验"></a>安全和校验</h2><p>对于需要读及更新 documents 的工程，CouchDB 提供了一个简单的读访问控<br>制及更新校验的模型来被拓展以实现自定义的安全模型。</p>
+<h3 id="管理员访问控制"><a href="#管理员访问控制" class="headerlink" title="管理员访问控制"></a>管理员访问控制</h3><p>CouchDB 数据库提供了管理员账户。管理员账户可以创建其他的管理员账号，并且可以更新 design documents。Design documents是一种包含了视图定义<br>及其他信息的特殊的 documents。</p>
+<h3 id="更新校验"><a href="#更新校验" class="headerlink" title="更新校验"></a>更新校验</h3><p>由于 document 被写入到磁盘中，它们可以被javascript函数动态校验。当<br>document 通过了所有的校验规则时，则更新操作被允许。如果校验失败，更<br>新操作将被中止，同时用户客户端将返回一个错误响应。</p>
+<p>校验规则需要用户的认证信息及将被更新的 document 作为输入，我们可以<br>通过验证用户的权限来实现自定义的 document 更新的安全模型。</p>
+<p>CouchDB 提供了一个基本的<code>author only</code>的 document 更新模型，它会校验<br>用户是否在 document 的<code>author</code>字段中。更动态的校验模型也是可以的，<br>比如检查一个单独的用户账户信息来判断权限。</p>
+<h2 id="分布式更新及同步"><a href="#分布式更新及同步" class="headerlink" title="分布式更新及同步"></a>分布式更新及同步</h2><p>CouchDB 是一个基于对等的分布式数据库系统。它允许用户和服务器在未连接时也能访问和更新同一份数据。各自所做的修改可以在后续进行双向同步。</p>
+<p>CouchDB的 document 存储，视图，及安全模型被设计来共同实现真正高效的<br>，可靠的双向同步。Documents 和 design documents都可以被同步，这就<br>允许全部的数据库应用（包括应用设计，逻辑及数据）都可以被同步到任何你需要的地方。</p>
+<p>同步的过程是增量的。在数据库级别，同步只检查 documents 最后一次同步<br>的更新。对于每一个更新的 document而言，只有有修改的fileds和blobs才<br>会经网络上同步。如果因为网络问题或者崩溃等问题，同步过程在任何一个地方失败了，下一次同步重新开始于上次失败的同一个 document 。</p>
+<p>允许同步部分的 documents。可以通过javascript函数过滤出需要同步的 documents。这就允许用户获取一个含有大量数据的数据库应用的一个子集来离线使用。</p>
+<h3 id="冲突"><a href="#冲突" class="headerlink" title="冲突"></a>冲突</h3><p>冲突检查及管理是任何分布式更新系统的一个重要问题。CouchDB 存储系统<br>把更新冲突视作一个普通的状态，而不是一个异常。在保留单 document 语义及允许去中心化的冲突解决的场景中，这种冲突处理模型是简单的，并且也是“非致命的”。</p>
+<p>CouchDB 允许在数据库中同时存在任意数量的有冲突的 documents，它让具体的数据库实例来决定哪些 document 是正确的，哪些是冲突的。只有正确的<br>documents能够出现在视图中，而哪些冲突的 documents 仍然保留在数据库中，并且也可以被访问到，直到被删除或在数据库compaction过程中被清除。因为冲突的 documents 仍然是普通的 documents，所以它们也会按普通的documents 那样被同步，以及应用安全校验规则。</p>
+<p>当出现分布式的更新冲突时，每一个同步的数据库都会得到同一个正确的版本，然后都有机会去解决冲突。冲突的解决可以手动或者依赖某种数据特性来自动完成。</p>
+<p>当多个用户或者代理尝试解决同一个冲突时，冲突的管理仍然奏效。如果解决一个冲突而引起更多的冲突时，系统将会按同样的方式来调解。</p>
+<h3 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h3><p>只使用基本的同步模型，不需要额外的工作就可以使很多单服务器数据库应用成为分布式的。CouchDB 的同步被设计为为基本的数据库应用提供开箱即用的功能。当然，也可以被拓展来满足更多特性的场景。</p>
+<p>只需要一点点数据库的工作，就可以构建一个分布式的，拥有细粒度安全控制和完整修订历史的文档管理应用。文档的修改可以被实现为field和blob的增<br>量同步，这样，被同步的修改就接近于实际中的修改差异（“diffs”）的效率。</p>
+<p>CouchDB的同步模型可以为其它的分布式更新模型做相应修改。如果存储引擎<br>允许多个 documents 的更新事务，那么当从上游服务器同步时，就可以执行类Subversion的“all or nothing”原子提交，那样，单个 document冲突或<br>校验失败时都会导致整个更新失败。如同 Subversion，冲突是通过拉取同步<br>来获取本地冲突，然后合并，最后同步回上游服务器来完成的。</p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>CouchDB 是构建于Erlang OTP（一个函数式，并发编程语言和开发平台）之上的。 Erlang是为需要高可靠性和高可用性的实时电信应用而开发的。</p>
+<p>Erlang的语法和语义与传统的编程语言如C或者Java有很大的区别。Erlang<br>使用轻量级的“进程”和消息传递机制来实现并发，它没有共享状态的线程机制，并且所有的数据都是不可变的。Erlang的健壮，并发特性非常适合数据库服务器。</p>
+<p>CouchDB被设计成类似Erlang的无锁并发的模型，实际上也正是用Erlang实现<br>的。降低瓶颈及避免锁的使用，使得在高负载的情况下，整个系统的状态是<br>可控的。不需要锁，CouchDB就可以满足多个客户端的同步修改，更新 documents，以及索引被其它客户端刷新的视图还可以同时被查询。</p>
+<p>为了更好的可用性及更多的并发支持，CouchDB还被设计为”shared nothing”<br>集群。集群中的每台机器都是独立的，并从集群中的其它机器同步数据，这就允许单个服务器零时间的宕机。因为重启过程不需要一致性检查和修复，所以即使整个集群崩溃了——例如数据中心电力不足——整个CouchDB分布式系统在重<br>启之后还是可以立刻服务。</p>
+<p>CouchDB 始于一个分布式文档数据库系统的一致性版本机制。CouchDB 不是在同样模型和数据库上组装一些分布式特性，而是从底层开始的工程。CouchDB<br>把文档/视图/安全/同步模型，特定用途的查询语言，高效健壮的磁盘文件布<br>局，以及Erlang平台的并发性和可靠性集中到一个系统当中。</p>
+</section>
+    <p class="post-date">2014 / 06 / 23</p>
+    <!-- Tags START -->
+    
+    <!-- Tags END -->
+    <!-- 打赏 START -->
+    
+    <!-- 打赏 END -->
+    <!-- 二维码 START -->
+    
+    <!-- 二维码 END -->
+    
+      <!-- No Comment -->
+    
+  </article>
+  <!-- Article END -->
+  <!-- Catalog START -->
+  
+    <aside class="catalog-container">
+  <div class="toc-main">
+    <strong class="toc-title">Catalog</strong>
+    
+      <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#Document-存储"><span class="toc-nav-text">Document 存储</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#ACID-特性"><span class="toc-nav-text">ACID 特性</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#Compaction"><span class="toc-nav-text">Compaction</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#视图"><span class="toc-nav-text">视图</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#视图模型"><span class="toc-nav-text">视图模型</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Javascript-视图函数"><span class="toc-nav-text">Javascript 视图函数</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#视图索引"><span class="toc-nav-text">视图索引</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#安全和校验"><span class="toc-nav-text">安全和校验</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#管理员访问控制"><span class="toc-nav-text">管理员访问控制</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#更新校验"><span class="toc-nav-text">更新校验</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#分布式更新及同步"><span class="toc-nav-text">分布式更新及同步</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#冲突"><span class="toc-nav-text">冲突</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#应用"><span class="toc-nav-text">应用</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#实现"><span class="toc-nav-text">实现</span></a></li></ol>
+    
+  </div>
+</aside>
+  
+  <!-- Catalog END -->
+</main>
+
+<script>
+  (function () {
+    var url = 'http://lujingbo.me/technical-overview-of-couchdb/';
+    var banner = ''
+    if (banner !== '' && banner !== 'undefined' && banner !== 'null') {
+      $('#article-banner').css({
+        'background-image': 'url(' + banner + ')'
+      })
+    } else {
+      $('#article-banner').geopattern(url)
+    }
+    $('.header').removeClass('fixed-header')
+
+     // error image
+    $(".markdown-content img").on('error', function() {
+      $(this).attr('src', 'http://file.muyutech.com/error-img.png')
+      $(this).css({
+        'cursor': 'default'
+      })
+    })
+
+    // zoom image
+    $(".markdown-content img").on('click', function() {
+      var src = $(this).attr('src')
+      if (src !== 'http://file.muyutech.com/error-img.png') {
+        var imageW = $(this).width()
+        var imageH = $(this).height()
+        
+        var zoom = ($(window).width() * 0.95 / imageW).toFixed(2)
+        zoom = zoom < 1 ? 1 : zoom
+        zoom = zoom > 2 ? 2 : zoom
+        var transY = (($(window).height() - imageH) / 2).toFixed(2)
+
+        $('body').append('<div class="image-view-wrap"><div class="image-view-inner"><img src="'+ src +'" /></div></div>')
+        $('.image-view-wrap').addClass('wrap-active')
+        $('.image-view-wrap img').css({
+          'width': `${imageW}`,
+          'transform': `translate3d(0, ${transY}px, 0) scale3d(${zoom}, ${zoom}, 1)`
+        })
+        $('html').css('overflow', 'hidden')
+
+        $('.image-view-wrap').on('click', function() {
+          $(this).remove()
+          $('html').attr('style', '')
+        })
+      }
+    })
+
+  })();
+</script>
+
+    <div class="scroll-top">
+  <span class="arrow-icon"></span>
+</div>
+    <script>
+  function async(u, c) {
+    var d = document, t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+    o.src = u;
+    if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+    s.parentNode.insertBefore(o, s);
+  }
+</script>
+<script>
+  async("//cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+    FastClick.attach(document.body);
+  })
+</script>
+
+<script>
+  var hasLine = 'true';
+  async("//cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js", function(){
+    $('figure pre').each(function(i, block) {
+      var figure = $(this).parents('figure');
+      if (hasLine === 'false') {
+        figure.find('.gutter').hide();
+      }
+      var lang = figure.attr('class').split(' ')[1] || 'code';
+      var codeHtml = $(this).html();
+      var codeTag = document.createElement('code');
+      codeTag.className = lang;
+      codeTag.innerHTML = codeHtml;
+      $(this).attr('class', '').empty().html(codeTag);
+      figure.attr('data-lang', lang.toUpperCase());
+      hljs.highlightBlock(block);
+    });
+  })
+</script>
+<!-- Baidu Tongji -->
+
+<script src="/js/script.js"></script>
+  </body>
+</html>

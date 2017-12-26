@@ -2,3 +2,4 @@ _site
 .sass-cache
 .deploy
 .code-highlighter-cache
+node_modules

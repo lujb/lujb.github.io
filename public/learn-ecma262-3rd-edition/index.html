@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <meta name="description" content="2b or not 2b">
+  <meta name="keyword" content="lujingbo, lujb, javascript">
+  
+    <link rel="shortcut icon" href="/css/images/logo.png">
+  
+  <title>
+    
+      读一读 ECMA262 3rd edition | #!/bin/env lujingbo
+    
+  </title>
+  <link href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href="//cdn.bootcss.com/nprogress/0.2.0/nprogress.min.css" rel="stylesheet">
+  <link href="//cdn.bootcss.com/highlight.js/9.12.0/styles/tomorrow.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+  <script src="//cdn.bootcss.com/geopattern/1.2.3/js/geopattern.min.js"></script>
+  <script src="//cdn.bootcss.com/nprogress/0.2.0/nprogress.min.js"></script>
+</head>
+<div class="wechat-share">
+  <img src="/css/images/logo.png" />
+</div>
+
+  <body>
+    <header class="header fixed-header">
+  <div class="header-container">
+    <a class="home-link" href="/">
+      <div class="logo"></div>
+      <span>#!/bin/env lujingbo</span>
+    </a>
+    <span class="header-title">读一读 ECMA262 3rd edition</span>
+    <ul class="right-list">
+      
+        <li class="list-item">
+          
+            <a href="/" class="item-link">Home</a>
+          
+        </li>
+      
+    </ul>
+    <div class="menu">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </div>
+    <div class="menu-mask">
+      <ul class="menu-list">
+        
+          <li class="menu-item">
+            
+              <a href="/" class="menu-link">Home</a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</header>
+
+    <div id="article-banner">
+  <h2>读一读 ECMA262 3rd edition</h2>
+</div>
+<main class="app-body flex-box">
+  <!-- Article START -->
+  <article class="post-article">
+    <section class="markdown-content"><h2 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h2><h3 id="Web-Scripting"><a href="#Web-Scripting" class="headerlink" title="Web Scripting"></a>Web Scripting</h3><p>JavaScript是一种在宿主环境中执行计算和操作计算对象的面向对象编程语言。它起初被设计为一种Web scripting language，用来增加网页的交互性，以及执行一些服务端的计算。ECMAScript规范描述了其在宿主环境中的core scripting能力。<br>Web浏览器为javascript提供了作为客户端计算的宿主环境。它提供了一些对象用来表示windows, menus, pop-ups, dialog boxes, text areas, anchors, frames, history, cookies, 以及input/output。并且，这个宿主环境也提供了一种手段用来将scripting code绑定到一些事件上。例如，change of focus, page and image loading, unloading, error and abort, selection, form submission, 以及mouse actions。Scripting code嵌入在HTML代码当中，显示出来的页面由一些用户界面元素和一些固定位置并已计算好的文本和图像构成。Scripting code在用户的交互下会被触发执行，而不需要一个main程序去触发。<br>而Web服务器为javascript提供了另一中作为服务端计算的宿主环境(如node.js)。它提供了一些对象用来表示requests, clients, 以及files。它也提供一种机制来锁住或共享数据。<a id="more"></a></p>
+<h3 id="Language-Overview"><a href="#Language-Overview" class="headerlink" title="Language Overview"></a>Language Overview</h3><p>Javascript是基于对象的：语言基础和宿主环境的功能都以对象的方式提供，并且一个javascript程序就是一个由一些相互通信的对象组成的集合。一个javascript对象是一个由properties构成的无序集合。每一个prpperty包含0个或多个attributes，用来决定每个property怎样使用。例如，当一个property的ReadOnly attribute被设置为true的话，任何改变该property的值的操作都会失效。Property是一个容器，用来包含其它的对象：primitive values或者methods。一个原始值(primitive value)是以下内建类型的一个成员：Undefined, Null, Boolean, Number, String。而一个对象则是剩下的Object这一内建类型的一个成员。一个method是一个可以通过property关联到一个对象的function。<br>javascript定义了一系列的内建对象，包括Global对象，Object对象，Function对象，Array对象，String对象，Boolean对象，Number对象，Math对象，Date对象，RegExp对象，和一些表示错误的对象(Error对象，EvalError对象，RangeError对象，ReferenceError对象，SyntaxError对象，TypeError对象，URIError对象)。</p>
+<h3 id="Objects"><a href="#Objects" class="headerlink" title="Objects"></a>Objects</h3><p>Javascript并没有其它面向对象语言如C++，Smalltalk，Java等中的class机制来创建新的对象。但javascript有constructor这一构造对象，通过执行constructor的代码来为分配对象空间，并初始化对象空间的一些属性(properties)，从来产生新的对象。所有的constructor都是对象，但并不是所有的对象都是constructor。每一个constructor都有一个名为Prototype的属性(property)，用来实现基于原型的继承(prototype-based inheritance)和共享属性(shared properties)。对象通过在new表达式中使用constructor来创建。例如：new String(“A String”)将创建一个新的String类型的对象。不使用new来调用constructor产生的效果将因constructor而异。例如：String(“A String”)将产生一个String类型的原始值(primitive value)，而不会是String类型的对象。</p>
+<p>Javascript支持基于prototype的继承。每一个constructor都通过prototype属性来显式关联一个prototype对象。通过constructor对象构造新对象时，将以这个prototype对象为原型进行创建。新产生的对象对这个prototype对象会有一个隐式关联(通过__proto__属性关联)，通常这个隐式关联在程序中不可直接访问。</p>
+<p>这里一共涉及到三个对象。设有一个构造对象Constructor，那么：</p>
+<ul>
+<li>这个constructor显式关联一个prototype对象：Constructor.prototype(显式原型引用)；</li>
+<li>新产生的对象与原型对象有一个隐式引用：NewObject.__proto__(隐式原型引用)；</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">+--------------------+  [prototype] +------------------+</span><br><span class="line">| Constructor Object |+------------&gt;| Prototype Object |</span><br><span class="line">+--------------------+      ^       +------------------+</span><br><span class="line">                            |                  ^</span><br><span class="line">                            |                  |</span><br><span class="line">* explicit prototype link --+                  | [__proto__]</span><br><span class="line">                                               |</span><br><span class="line">* implicit prototype link --------------------&gt;|</span><br><span class="line">                                        +------+-----+</span><br><span class="line">                                        | New Object |</span><br><span class="line">                                        +------------+</span><br></pre></td></tr></table></figure>
+<p>此外，原型对象(NewObject.__proto__)也可以有一个它自己的隐式非空(non-null)原型引用(NewObject.__proto__.__proto__)，这样就形成一个原型链。当引用对象的某一个属性时，依次从这个对象和原型链上的原型对象的属性集合中找第一个包含此属性的对象，然后返回该属性值。<br>在基于类的面向对象语言中，一般地，状态(属性值)由实例对象持有，方法由类持有，继承的只是结构(属性)和行为(方法)。而在javascript中，状态和方法都由对象持有。结构，行为，和状态都将被继承。<br>对象并不直接包含原型链上共享出来的属性。</p>
+<h3 id="Definitions"><a href="#Definitions" class="headerlink" title="Definitions"></a>Definitions</h3><ul>
+<li>Type：类型是数据值的集合</li>
+<li>Primitive Value：原始值是Undefined/Null/Boolean/Number/String类型的值之一，是语言实现最底层的直接数据表示。</li>
+<li>Object：对象是Object类型的值，是properties的无序集合，每个property都可以包含primitive value/object/function。存在于对象的property中的function又称为method(方法)。</li>
+<li>Constructor：构造子(也即构造对象)是一个Function对象(通过Function这一构造子创建出来的对象)，用来创建和初始化新的对象。每一个构造子都有一个关联的prototype对象用来实现继承和共享属性。这里要明白的是，javascript中对象(通过new Object()创建，{}这种对象字面量只是new Object的一种简写方式)都是通过构造子，而自定义的构造子又是通过Function这一内置构造子生成出来的(即new Function()创建，function(){}这种函数字面量也只是new Function的一种简方式)。</li>
+<li>Prototype：原型对象是用来实现继承结构，状态和行为的。当构造子创建一个对象时，新生成的对象会对构造子关联的原型对象有一个隐式引用(通过__proto__属性)，以便以后解析属性引用时使用。构造子关联的原型对象可以显式的通过Constructor.prototype来引用。原型对象添加的属性可以通过这种继承机制而被新生成的对象访问到。</li>
+<li>Native/Built-in/Host Object：这些貌似不重要。</li>
+<li>Undefined Type/Value：当一个变量并没有被赋值时，即为此种类型和值。这里存在一个歧义：即未定义的是变量还是变量的值？一种好的处理办法是，用undefined来表示变量为定义，而用null来表示值未定义。</li>
+<li>Null Type/Value：表示null，空值，或者不存在的引用(规范上是这么写的。。)。</li>
+<li>Boolean Type/Value</li>
+<li>Boolean Object：Object类型的值，是内建Boolean对象的实例(即通过Boolean这一构造子new出来的)。可通过Boolean(b)来获取其布尔值。</li>
+<li>String Type/Value：每个字符是16bit的UTF-16编码。</li>
+<li>String Object：Object类型的值，是内建String对象的实例。可通过String(s)来获取字符串值。</li>
+<li>Number Type/Value：能表示双精度64位格式的IEEE754规范的数字，包括NaN(<code>Not-a-Number</code>)及正无穷和负无穷。</li>
+<li>Number Object：Object类型的值，是内建Number对象的实例。可通过Number(n)来获取值。</li>
+<li>Infinity：Number类型的原始值，表示正无穷大。</li>
+<li>NaN：Number类型的原始值，表示IEEE标准中的<code>Not-a-Number</code>集合的值。</li>
+</ul>
+<h2 id="Notational-Conventions"><a href="#Notational-Conventions" class="headerlink" title="Notational Conventions"></a>Notational Conventions</h2><p>本节主要描述定义javascript词法和语法结构的上下文无关文法。</p>
+<h3 id="Context-Free-Grammars"><a href="#Context-Free-Grammars" class="headerlink" title="Context-Free Grammars"></a>Context-Free Grammars</h3><p>上下文无关(Context-Free)文法由一些产生式(productions)组成。每个产生式由一个称为非终结符(nonterminal)的抽象符号作为左部分，一个由0个或多个非终结符和终结符(terminal)作为右部分构成。每条文法中的终结符都来自于一个有限的字符集合。词法分析产生语法分析的输入流，这里面包含词素(token)，即保留字/标识符/字面量/标点符。虽然换行符不是词素，但也包含在输入流中，用来指示自动插入<code>;</code>符号。注释的处理方式如下：</p>
+<ul>
+<li>单行注释(即以<code>//</code>开始)被直接抛弃(当然末尾的换行符被保留了)；</li>
+<li>多行注释(包含在<code>/* */</code>中)如果其中没有换行符则直接抛弃，否则用一个换行符替代；</li>
+</ul>
+<h3 id="Identifiers"><a href="#Identifiers" class="headerlink" title="Identifiers"></a>Identifiers</h3><p>标识符的语法描述。<br>    ReservedWord ::<br>        Keyword<br>        FutureReservedWord<br>        NullLiteral<br>        BooleanLiteral<br>    Identifier ::<br>        IdentifierName but not ReservedWord<br>看见没有，根据这个描述，undefined/Infinity/NaN都是可以作为标识符的，其实，它们都是全局常量。</p>
+<h2 id="Types"><a href="#Types" class="headerlink" title="Types"></a>Types</h2><ul>
+<li>Undefined/Null/Boolean/String/Number</li>
+<li>Object。Property attributes:<ul>
+<li>ReadOnly(用户代码的写操作被忽略，但宿主环境可以写)；</li>
+<li>DontEnum(for-in枚举表达式中不会被枚举出来)；</li>
+<li>DontDelete(删除Property的操作被忽略)；</li>
+<li>Internal(没有名字，因此也不能通过property accessor operator直接访问)；</li>
+</ul>
+</li>
+<li>Reference/List/Completion：这些类型的值只出现在表达式求值的中间结果中，不能保存到对象的属性中。</li>
+</ul>
+<h3 id="Internal-Properties-and-Methods"><a href="#Internal-Properties-and-Methods" class="headerlink" title="Internal Properties and Methods"></a>Internal Properties and Methods</h3><p>当Javascript的某种功能用到对象的Internal Property，而这个对象又没有实现这一Internal Property，则TypeError的异常将会抛出。<br>有两种访问normal(non-internal) properties的方法：get/put操作，对应于retrieval和assignment。<br>Javascript的native对象有一个叫[[Prototype]]的内部属性，它的值要么为null，要么为一个对象(用来实现继承，并且它的属性只支持读操作)。</p>
+<h2 id="Execution-Contexts"><a href="#Execution-Contexts" class="headerlink" title="Execution Contexts"></a>Execution Contexts</h2><p>当Javascript函数对象代码开始执行时，execution context(执行上下文)就产生了，Active execution contexts逻辑上构建了一个栈，栈顶的execution context就是正在运行中的执行上下文。</p>
+<h3 id="Function-Objects"><a href="#Function-Objects" class="headerlink" title="Function Objects"></a>Function Objects</h3><ul>
+<li>通过FunctionDeclaration语法定义，FunctionExpression语法或内建Function构造子动态创建的函数对象，将产生执行上下文；</li>
+<li>内建对象的internal functions，例如：parseInt/Math.exp等。这些函数对象并不包含Javascript可执行代码，它们并不产生execution context。</li>
+</ul>
+<h3 id="Types-of-Executable-Code"><a href="#Types-of-Executable-Code" class="headerlink" title="Types of Executable Code"></a>Types of Executable Code</h3><p>一共有3种Javascript可执行代码类型：</p>
+<ul>
+<li>Global code：FunctionBody以外的source text。</li>
+<li>Eval code：作为内建函数eval的字符串参数。</li>
+<li>Function code：FunctionBody内的source text(不包含嵌套的FunctionBody)。</li>
+</ul>
+<h3 id="Variable-Instantiation"><a href="#Variable-Instantiation" class="headerlink" title="Variable Instantiation"></a>Variable Instantiation</h3><p>每一个execution context都有一个关联的variable object(简称VO)。一个execution context下的变量和函数声明都将作为properties添加到VO上。对于Function Code，参数也将作为properties添加到VO上。<br>当进入一个execution context时，绑定到VO对象上的属性顺序如下：</p>
+<ul>
+<li>对于function code而言，会为相应VO对象创建与定义在FormalParameterList中的形参同名的属性，其值为caller调用[[Call]]时传递的实参。如果实参个数少于形参，则剩余的形参将被赋值为undefined。如果形参列表中存在同名时，则同名的VO属性值以最后一个形参的值为准。</li>
+<li>对于executable code中的FunctionDeclaration而言，执行上下文中的VO将会有一个与该函数声明中的标识符同名的属性，其值为声明的函数对象。如果VO中已经有同名的属性名，则用此值覆盖之前的。</li>
+<li>对于executable code中的VariableDeclaration而言，执行上下文中的VO将会有一个与该变量声明中的标识符同名的属性。如果VO中已经有同名的属性名，则该property的value和attributes保持不变。</li>
+</ul>
+<h3 id="Scope-Chain-and-Identifier-Resolution"><a href="#Scope-Chain-and-Identifier-Resolution" class="headerlink" title="Scope Chain and Identifier Resolution"></a>Scope Chain and Identifier Resolution</h3><p>每个execution context都有一个关联的scope chain(作用域链)。作用域链是当标识符求值时查找的一组对象。当进入execution context时，作用域链就形成了。而在一个execution context中，其作用域链只被with和catch语句影响。标识符解析步骤：</p>
+<ol>
+<li>获取作用域链的下一个对象，如果获取不到，则进入5；</li>
+<li>调用Result(1)对象的[[HasProperty]]方法，并传递此标识符作为property；</li>
+<li>若Result(2)为true，则返回一个引用类型的值，它的base object是Result(1)对象，属性名是此标识符；</li>
+<li>否则，返回1继续；</li>
+<li>返回一个引用类型的值，它的base object为null，属性名是此标识符。</li>
+</ol>
+<h3 id="Global-Object"><a href="#Global-Object" class="headerlink" title="Global Object"></a>Global Object</h3><p>有一个唯一的global object，在未进入任何execution context之前就创建了。它有以下属性：</p>
+<ul>
+<li>内建对象如：Math/String/Data/parseInt等，它们有DontEnum的attributes；</li>
+<li>额外的宿主定义的属性。可能包含一个属性，其值为全局对象自身。例如，在HTML文档对象模型中，全局对象的window属性就是全局对象自身；</li>
+</ul>
+<p>当进入到execution contexts中时，额外的属性可能会被追加到全局对象上，初始的属性也可能会改变。</p>
+<h3 id="Activation-Object"><a href="#Activation-Object" class="headerlink" title="Activation Object"></a>Activation Object</h3><p>当进入到function code的execution context中时，一个称为Activation object(简称AO)就被创建了，并被关联到该execution contect上。这个AO有一个名为arguments的Property，且其有DontDelete的attribute。这个property的初始值是一个arguments object。<br>这个AO接下来用来充作variable instantiation中的VO。<br>AO只是一种机制，不可能通过javascript代码访问到这个对象(虽然可以访问到这个对象的成员)。当一个call操作被应用到一个base object为一个AO的引用类型的值的时候，这个call的this就被设置为null。</p>
+<h3 id="This"><a href="#This" class="headerlink" title="This"></a>This</h3><p>当进入execution context时，该execution context会关联一个this值。并且在这个execution context中this值是不可变的。</p>
+<h3 id="Arguments-Object"><a href="#Arguments-Object" class="headerlink" title="Arguments Object"></a>Arguments Object</h3><p>当进入一个function code的execution context时，一个arguments object被创建并初始化：</p>
+<ul>
+<li>Arguments Object的内部属性[[Prototype]]被设置为Object.prototype；</li>
+<li>一个名为callee的DontEnum属性被创建，它的初始值为当前执行的函数对象。有了这个属性，就可以实现匿名函数的递归了;</li>
+<li>一个名为length的DontEnum属性被创建，它的初始值为caller传递的实参个数；</li>
+<li>一个名为ToString(arg)的DontEnum属性被创建，它的初始值为caller传递的实参(arg=0表示第一个实参，访问方式为arguments[0])，这个属性与AO/VO中实参属性共享其值，它们能相互影响。</li>
+</ul>
+<h2 id="Entering-An-Execution-Context"><a href="#Entering-An-Execution-Context" class="headerlink" title="Entering An Execution Context"></a>Entering An Execution Context</h2><p>每个函数和构造子调用都将进入一个新的execution context中，即使是一个递归的函数调用。每一个return都将退出一个execution context。一个没有捕获的异常抛出，可能会退出一个或多个execution context。<br>当进入一个execution context时，scope chain就被创建并被初始化了，variable instanitiation也就完成了，并且this值也确定了。它们的初始化过程取决于执行的executable code类型。</p>
+<h3 id="Global-Code"><a href="#Global-Code" class="headerlink" title="Global Code"></a>Global Code</h3><ul>
+<li>作用域链被创建，并初始化为只包含global object；</li>
+<li>Variable instantiation被执行：使用global object作为VO，并设置为DontDelete；</li>
+<li>this值被设置为global object；</li>
+</ul>
+<h3 id="Eval-Code"><a href="#Eval-Code" class="headerlink" title="Eval Code"></a>Eval Code</h3><p>当进入eval code的execution context时，先前的活跃active execution context(也被称为calling context)用来决定scope chain，variable object和this值。如果不存在calling context，那么初始化scope chain，variable object和this值的过程与global code一样，否则：</p>
+<ul>
+<li>作用域链按同样的顺序包含calling context的作用域链中的所有对象，这包括在calling context中通过with/catch语句追加到作用域链中的对象；</li>
+<li>使用calling context的VO对象来执行Variable instantiation过程，但清空property attributes；</li>
+<li>this值设置为calling context的this值；</li>
+</ul>
+<h3 id="Function-Code"><a href="#Function-Code" class="headerlink" title="Function Code"></a>Function Code</h3><ul>
+<li>scope chain初始化为包含AO，紧跟着的是当前Function object的[[Scope]]属性中保存的scope chain中的所有对象；</li>
+<li>Variable instantiation执行：使用AO作为VO，并设置DontDelete；</li>
+<li>当caller的this值是对象时，则设置当前的this值为call的this值。否则设置当前的this值为global object；</li>
+</ul>
+<h2 id="Expressions"><a href="#Expressions" class="headerlink" title="Expressions"></a>Expressions</h2><h2 id="Statements"><a href="#Statements" class="headerlink" title="Statements"></a>Statements</h2><h2 id="Function-Definition"><a href="#Function-Definition" class="headerlink" title="Function Definition"></a>Function Definition</h2><h2 id="Native-Javascript-Objects"><a href="#Native-Javascript-Objects" class="headerlink" title="Native Javascript Objects"></a>Native Javascript Objects</h2><p>在javascript程序执行前就已经存在一些内建对象了。其中一个就是global object，它存在于scope chain中。其它的作为global object的初始properties访问。<br>如果内建对象有[[Call]]这一内部property，则它的[[Class]]属性值为”Function”，否则[[Class]]属性值为”Object”<br>许多的内建对象同时也是函数(即函数对象)：它们可以被调用。这些函数对象中的某些还是constructors：可以用于new操作符。对于每个内建函数对象，规范描述了该函数调用时的形参及该对象的properties。对于每个内建constructor，规范还描述了其原型对象的properties及通过该构造子实例化出来的子对象的properties。<br>如果一个函数或构造子调用时实参个数少于形参，那么剩下的形参被赋值为undefined。<br>如果一个函数或构造子调用时实参个数多于形参，那么它的行为是未定义的。这种情况下，允许实现抛出一个TypeError的异常。<br>每个内建函数对象(包括构造对象)都有Function的原型对象，即Function.prototype作为它们的[[Prototype]]属性值，eg：Function.__proto__==Function.prototype。<br>每个内建原型对象都有Object的原型对象，即Object.prototype作为他们的[[Prototype]]属性值。eg：Function.prototype.__proto__ == Object.prototype。<br>总结：函数对象的原型对象是Function.prototype；其他对象的原型对象是Object.prototype；而Object.prototype的原型对象为null(即Object.prototype.__proto__==null)。<br>所有的内建非构造子函数对象都不会实现内部属性[[Construct]]方法及prototype属性。所有的内建函数对象都一个表示形参个数的{ReadOnly/DontDelete/DontEnum}的length属性。</p>
+<h3 id="The-Global-Object"><a href="#The-Global-Object" class="headerlink" title="The Global Object"></a>The Global Object</h3><p>全局对象并没有[[Construct]]属性(否则就是构造子了)，所以不能对全局对象进行new操作。全局对象也没有[[Call]]属性(否则就是函数对象了)，所以全局对象不能作为函数来调用。<br>全局对象的[[Prototype]]及[[Class]]属性值是依赖于实现的。</p>
+<h4 id="Value-Properties-of-the-Global-Object"><a href="#Value-Properties-of-the-Global-Object" class="headerlink" title="Value Properties of the Global Object"></a>Value Properties of the Global Object</h4><ul>
+<li>NaN，初始值为NaN，{DontEnum, DontDelete}</li>
+<li>Infinity，初始值为+o，{DontEnum，DontDelete}</li>
+<li>undefined，初始值是undefined，{DontEnum，DontDelete}</li>
+</ul>
+<h4 id="Function-Properties-of-the-Global-Object"><a href="#Function-Properties-of-the-Global-Object" class="headerlink" title="Function Properties of the Global Object"></a>Function Properties of the Global Object</h4><ul>
+<li>eval(x)</li>
+<li>parseInt(string, radix)</li>
+<li>parseFloat(string)</li>
+<li>isNaN(number)</li>
+<li>isFinite(number)</li>
+</ul>
+<h4 id="URI-Handling-Function-Properties"><a href="#URI-Handling-Function-Properties" class="headerlink" title="URI Handling Function Properties"></a>URI Handling Function Properties</h4><ul>
+<li>decodeURI(encodedURI)</li>
+<li>decodeURIComponent(encodedURIComponent)</li>
+<li>encodeURI(uri)</li>
+<li>encodeURIComponent(uriComponent)</li>
+</ul>
+<h4 id="Constructor-Properties-of-the-Global-Object"><a href="#Constructor-Properties-of-the-Global-Object" class="headerlink" title="Constructor Properties of the Global Object"></a>Constructor Properties of the Global Object</h4><ul>
+<li>Object</li>
+<li>Function</li>
+<li>Array</li>
+<li>String</li>
+<li>Boolean</li>
+<li>Number</li>
+<li>Date</li>
+<li>RegExp</li>
+<li>Error</li>
+<li>EvalError</li>
+<li>RangeError</li>
+<li>ReferenceError</li>
+<li>SyntaxError</li>
+<li>TypeError</li>
+<li>URIError</li>
+</ul>
+</section>
+    <p class="post-date">2014 / 03 / 03</p>
+    <!-- Tags START -->
+    
+    <!-- Tags END -->
+    <!-- 打赏 START -->
+    
+    <!-- 打赏 END -->
+    <!-- 二维码 START -->
+    
+    <!-- 二维码 END -->
+    
+      <!-- No Comment -->
+    
+  </article>
+  <!-- Article END -->
+  <!-- Catalog START -->
+  
+    <aside class="catalog-container">
+  <div class="toc-main">
+    <strong class="toc-title">Catalog</strong>
+    
+      <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#Overview"><span class="toc-nav-text">Overview</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Web-Scripting"><span class="toc-nav-text">Web Scripting</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Language-Overview"><span class="toc-nav-text">Language Overview</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Objects"><span class="toc-nav-text">Objects</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Definitions"><span class="toc-nav-text">Definitions</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#Notational-Conventions"><span class="toc-nav-text">Notational Conventions</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Context-Free-Grammars"><span class="toc-nav-text">Context-Free Grammars</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Identifiers"><span class="toc-nav-text">Identifiers</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#Types"><span class="toc-nav-text">Types</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Internal-Properties-and-Methods"><span class="toc-nav-text">Internal Properties and Methods</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#Execution-Contexts"><span class="toc-nav-text">Execution Contexts</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Function-Objects"><span class="toc-nav-text">Function Objects</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Types-of-Executable-Code"><span class="toc-nav-text">Types of Executable Code</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Variable-Instantiation"><span class="toc-nav-text">Variable Instantiation</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Scope-Chain-and-Identifier-Resolution"><span class="toc-nav-text">Scope Chain and Identifier Resolution</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Global-Object"><span class="toc-nav-text">Global Object</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Activation-Object"><span class="toc-nav-text">Activation Object</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#This"><span class="toc-nav-text">This</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Arguments-Object"><span class="toc-nav-text">Arguments Object</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#Entering-An-Execution-Context"><span class="toc-nav-text">Entering An Execution Context</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Global-Code"><span class="toc-nav-text">Global Code</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Eval-Code"><span class="toc-nav-text">Eval Code</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Function-Code"><span class="toc-nav-text">Function Code</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#Expressions"><span class="toc-nav-text">Expressions</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#Statements"><span class="toc-nav-text">Statements</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#Function-Definition"><span class="toc-nav-text">Function Definition</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#Native-Javascript-Objects"><span class="toc-nav-text">Native Javascript Objects</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#The-Global-Object"><span class="toc-nav-text">The Global Object</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#Value-Properties-of-the-Global-Object"><span class="toc-nav-text">Value Properties of the Global Object</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#Function-Properties-of-the-Global-Object"><span class="toc-nav-text">Function Properties of the Global Object</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#URI-Handling-Function-Properties"><span class="toc-nav-text">URI Handling Function Properties</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#Constructor-Properties-of-the-Global-Object"><span class="toc-nav-text">Constructor Properties of the Global Object</span></a></li></ol></li></ol></li></ol>
+    
+  </div>
+</aside>
+  
+  <!-- Catalog END -->
+</main>
+
+<script>
+  (function () {
+    var url = 'http://lujingbo.me/learn-ecma262-3rd-edition/';
+    var banner = ''
+    if (banner !== '' && banner !== 'undefined' && banner !== 'null') {
+      $('#article-banner').css({
+        'background-image': 'url(' + banner + ')'
+      })
+    } else {
+      $('#article-banner').geopattern(url)
+    }
+    $('.header').removeClass('fixed-header')
+
+     // error image
+    $(".markdown-content img").on('error', function() {
+      $(this).attr('src', 'http://file.muyutech.com/error-img.png')
+      $(this).css({
+        'cursor': 'default'
+      })
+    })
+
+    // zoom image
+    $(".markdown-content img").on('click', function() {
+      var src = $(this).attr('src')
+      if (src !== 'http://file.muyutech.com/error-img.png') {
+        var imageW = $(this).width()
+        var imageH = $(this).height()
+        
+        var zoom = ($(window).width() * 0.95 / imageW).toFixed(2)
+        zoom = zoom < 1 ? 1 : zoom
+        zoom = zoom > 2 ? 2 : zoom
+        var transY = (($(window).height() - imageH) / 2).toFixed(2)
+
+        $('body').append('<div class="image-view-wrap"><div class="image-view-inner"><img src="'+ src +'" /></div></div>')
+        $('.image-view-wrap').addClass('wrap-active')
+        $('.image-view-wrap img').css({
+          'width': `${imageW}`,
+          'transform': `translate3d(0, ${transY}px, 0) scale3d(${zoom}, ${zoom}, 1)`
+        })
+        $('html').css('overflow', 'hidden')
+
+        $('.image-view-wrap').on('click', function() {
+          $(this).remove()
+          $('html').attr('style', '')
+        })
+      }
+    })
+
+  })();
+</script>
+
+    <div class="scroll-top">
+  <span class="arrow-icon"></span>
+</div>
+    <script>
+  function async(u, c) {
+    var d = document, t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+    o.src = u;
+    if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+    s.parentNode.insertBefore(o, s);
+  }
+</script>
+<script>
+  async("//cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+    FastClick.attach(document.body);
+  })
+</script>
+
+<script>
+  var hasLine = 'true';
+  async("//cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js", function(){
+    $('figure pre').each(function(i, block) {
+      var figure = $(this).parents('figure');
+      if (hasLine === 'false') {
+        figure.find('.gutter').hide();
+      }
+      var lang = figure.attr('class').split(' ')[1] || 'code';
+      var codeHtml = $(this).html();
+      var codeTag = document.createElement('code');
+      codeTag.className = lang;
+      codeTag.innerHTML = codeHtml;
+      $(this).attr('class', '').empty().html(codeTag);
+      figure.attr('data-lang', lang.toUpperCase());
+      hljs.highlightBlock(block);
+    });
+  })
+</script>
+<!-- Baidu Tongji -->
+
+<script src="/js/script.js"></script>
+  </body>
+</html>

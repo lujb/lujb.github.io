@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <meta name="description" content="2b or not 2b">
+  <meta name="keyword" content="lujingbo, lujb, javascript">
+  
+    <link rel="shortcut icon" href="/css/images/logo.png">
+  
+  <title>
+    
+      [译] 解析JavaScript的事件循环机制 | #!/bin/env lujingbo
+    
+  </title>
+  <link href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href="//cdn.bootcss.com/nprogress/0.2.0/nprogress.min.css" rel="stylesheet">
+  <link href="//cdn.bootcss.com/highlight.js/9.12.0/styles/tomorrow.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+  <script src="//cdn.bootcss.com/geopattern/1.2.3/js/geopattern.min.js"></script>
+  <script src="//cdn.bootcss.com/nprogress/0.2.0/nprogress.min.js"></script>
+</head>
+<div class="wechat-share">
+  <img src="/css/images/logo.png" />
+</div>
+
+  <body>
+    <header class="header fixed-header">
+  <div class="header-container">
+    <a class="home-link" href="/">
+      <div class="logo"></div>
+      <span>#!/bin/env lujingbo</span>
+    </a>
+    <span class="header-title">[译] 解析JavaScript的事件循环机制</span>
+    <ul class="right-list">
+      
+        <li class="list-item">
+          
+            <a href="/" class="item-link">Home</a>
+          
+        </li>
+      
+    </ul>
+    <div class="menu">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </div>
+    <div class="menu-mask">
+      <ul class="menu-list">
+        
+          <li class="menu-item">
+            
+              <a href="/" class="menu-link">Home</a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</header>
+
+    <div id="article-banner">
+  <h2>[译] 解析JavaScript的事件循环机制</h2>
+</div>
+<main class="app-body flex-box">
+  <!-- Article START -->
+  <article class="post-article">
+    <section class="markdown-content"><p><a href="http://blog.carbonfive.com/2013/10/27/the-javascript-event-loop-explained/" target="_blank" rel="noopener">原文链接</a></p>
+<h2 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h2><p>在web浏览器的世界中，JavaScript可以说是无处不在，也正因如此，大部分人对<br>JavaScript的事件驱动(event-driven)模型，以及它与Ruby，Python，<br>Java等语言所使用的请求-响应(request-response)模型的区别或多或少都有一些<br>基本的了解。我将在本文中阐述JavaScript并发(concurrency)模型的一些核心<br>概念，包括事件循环(event-loop)和消息队列(message queue)，以便帮你有更<br>深入的理解。<a id="more"></a></p>
+<h2 id="本文受众"><a href="#本文受众" class="headerlink" title="本文受众"></a>本文受众</h2><p>本文主要面对的是在客户端或服务端使用JavaScript的web开发者。如果你已经非常<br>熟悉事件循环机制了，敬请拍砖。如果不是，我希望你能从本文有所收获。</p>
+<h2 id="非阻塞I-O"><a href="#非阻塞I-O" class="headerlink" title="非阻塞I/O"></a>非阻塞I/O</h2><p>在JavaScript中，几乎所有的I/O都是非阻塞(non-blocking)的。包括HTTP请求，<br>数据库操作，以及磁盘的读写。当执行这些I/O指令时，唯一的js执行线程会<br>请求runtime去做这些I/O，并提供一个callback函数，然后执行线程继续<br>压入执行后续的其它指令。当这个I/O操作被执行完后，runtime就会压入一条<br>包含对应callback的消息到执行线程的消息队列中。在后续的某个时刻，这条消息<br>被执行线程取出来并执行其中的callback函数。</p>
+<p>这种模型对于用户界面的开发者而言再熟悉不过了。诸如<code>鼠标按下</code>,<br><code>点击</code>等事件可以在任意时刻被触发。这与在服务端应用中典型的同步，<br>请求-相应模型有很大的区别。</p>
+<p>我们来看一下这两种类型的区别。考虑HTTP请求www.google.com并输<br>出响应到控制台。首先上Ruby代码:</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">response = Faraday.get <span class="string">'http://www.google.com'</span></span><br><span class="line">puts response</span><br><span class="line">puts <span class="string">'Done!'</span></span><br></pre></td></tr></table></figure>
+<p>执行步骤很简明：</p>
+<ol>
+<li>执行get方法，执行线程等待响应</li>
+<li>get方法接受到Google的响应，并返回给调用者，保存到response变量中</li>
+<li>输出response变量到控制台</li>
+<li>输出<code>Done!</code>到控制台</li>
+</ol>
+<p>而用JavaScript(Node.js)来实现:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">request(<span class="string">'http://www.google.com'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">error, response, body</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(body); &#125;);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'Done!'</span>);</span><br></pre></td></tr></table></figure></p>
+<p>有点不一样吧，并且结果有很大区别：</p>
+<ol>
+<li>执行request函数，传递一个匿名函数作为回调</li>
+<li>立刻输出’Done!’到控制台</li>
+<li>后续某个时间获得Google的响应数据后，执行先前传递的回调(输出response到控制台)</li>
+</ol>
+<h2 id="事件循环"><a href="#事件循环" class="headerlink" title="事件循环"></a>事件循环</h2><p>将调用与(I/O)响应的解耦允许JavaScript执行线程去执行其它的指令，而不用等待<br>I/O操作的完成及回调的执行。但这些callback被存放在内存的什么位置呢？它们以什么样<br>的顺序执行的呢？什么导致callback被执行的呢？</p>
+<p>JavaScript的执行线程包含一个消息队列，用来存储将被处理的消息及其关联的callback<br>函数。每当产生一个事件(例如鼠标点击，收到HTTP响应)，并伴随着一个回调函数，都会生成<br>一个消息，并被压入队列。但如果产生事件时没有相应的回调函数提供，那么就不有消息压入队<br>列。(整个程序作为初始消息回调压入队列)</p>
+<p>每次事件循环中(每循环一次，称为一个tick)，都会从消息队列中取一条消息，当取到一条<br>消息时，相应的回调函数就会被执行。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">init</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> link = <span class="built_in">document</span>.getElementById(<span class="string">"foo"</span>);</span><br><span class="line">    link.addEventListener(<span class="string">"click"</span>, <span class="function"><span class="keyword">function</span> <span class="title">changeColor</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.style.color = <span class="string">"burlywook"</span>;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<img src="https://erinswensonhealey.mybalsamiq.com/mockups/1228688.png?key=3f4ddd52e36d26e53ce8028ea38b5b64592e6b1a" class="myimg">
+<p>(从图中1开始看)回调函数的调用作为call stack上的初始帧。由于JavaScript执行引擎<br>是单线程的，后续的消息提取和处理就会被暂停，直到当前stack上所有的调用都返回为止。</p>
+<p>在这个例子当中，当用户点击<code>foo</code>标签时，<code>onclick</code>事件被触发了，这时，一个消息(包含它的回调函数changeColor)被压入到了消息队列中了。当这条消息被取出时，它的<br>回调函数changeColor将会被执行。当changeColor返回时(或抛出了error)，该消息<br>处理完毕，事件循环才能取下一条消息来处理。</p>
+<h2 id="执行消息队列中的回调函数时产生新的消息"><a href="#执行消息队列中的回调函数时产生新的消息" class="headerlink" title="执行消息队列中的回调函数时产生新的消息"></a>执行消息队列中的回调函数时产生新的消息</h2><p>如果一个异步函数(如setTimeout)被调用了，那么相应的回调函数最终会在后续某个事件<br>循环中作为消息的回调函数而被执行。看下面这个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">f</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">"foo"</span>);</span><br><span class="line">	setTimeout(g, <span class="number">0</span>);</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">"baz"</span>);</span><br><span class="line">	h();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">g</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">"bar"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">h</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">"blix"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">f();</span><br></pre></td></tr></table></figure></p>
+<p>由于setTimeout函数的非阻塞特性，它的回调函数至少在未来0微秒后执行，并且在本次<br>事件循环处理消息过程中不执行。在这个例子中，调用了setTimeout，并传递回调函数g<br>以及0微秒的超时时间。当指定的超时时间满足以后(本例中几乎瞬时)，一个包含回调函数g<br>的消息将会被压人消息队列。最终控制台将会依次显示：<code>foo</code>，<code>baz</code>，<code>blix</code>。最后在<br>下一次事件循环处理消息(tick)的时候，打印出<code>bar</code>来。如果在同一个调用帧中有两次调<br>用setTimeout，且超时时间相同，那么这两个包含相应回调函数的异步消息将以调用的顺序<br>进入消息队列中。</p>
+<p>异步函数(如setTimeout)很容易实现任务的延迟执行，而不需要spawn出新的线程。JavaScript<br>的异步函数通常只有两类：I/O和timing。</p>
+<h2 id="Web-Workers"><a href="#Web-Workers" class="headerlink" title="Web Workers"></a>Web Workers</h2><p>通过使用Web Workers技术可以把一些费时的操作放到worker线程中去执行，从而分解主线<br>程的执行压力。worker线程包含一个独立的消息队列，事件循环以及内存空间。worker线程<br>与主线程之间是通过消息传递的方式进行通信的。</p>
+<img src="https://erinswensonhealey.mybalsamiq.com/mockups/1218698.png?key=3f4ddd52e36d26e53ce8028ea38b5b64592e6b1a" class="myimg">
+<p>首先看一下worker线程的代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// our worker, which does some CPU-intensive operation</span></span><br><span class="line"><span class="keyword">var</span> reportResult = <span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</span><br><span class="line">	pi = SomeLib.computePiToSpecifiedDecimals(e.data);</span><br><span class="line">	postMessage(pi);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">onmessage = reportResult;</span><br></pre></td></tr></table></figure></p>
+<p>接着看一下主线程的调用：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// our main code, in a `&lt;script&gt;` tag in our HTML page;</span></span><br><span class="line"><span class="keyword">var</span> piWorker = <span class="keyword">new</span> Worker(<span class="string">"pi_calculator.js"</span>);</span><br><span class="line"><span class="keyword">var</span> logResult = <span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">"PI: "</span> + e.data);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">piWorker.addEventListener(<span class="string">"message"</span>, logResult, <span class="literal">false</span>);</span><br><span class="line">piWorker.postMessage(<span class="number">100000</span>);</span><br></pre></td></tr></table></figure></p>
+<p>在这个例子中，主线程spawn出一个worker线程，并且为其注册logResult<br>回调函数到<code>message</code>事件上。当worker线程接收到来自主线程的消息时，<br>worker线程将消息及回调函数logResult绑定在一起压入自身的消息队列中。<br>当worker消息从其消息队列取消息时，会向主线程回馈一个消息，同样绑定<br>回调函数logResult。通过这种方式，开发者就可以将CPU密集型的任务代理给<br>worker线程来执行，而不用阻塞主线程，从而主线程就能继续处理消息和事件了。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>JavaScript的事件驱动模型与许多程序员所熟悉的请求-响应模型是有很大区别<br>的，但一点也不高深莫测。只用简单的消息队列以及事件循环，JavaScript开发<br>者就可以使用大量的异步回调来构建它们的系统，让runtime在等待外部事件的发<br>生的时候，处理并发指令。但这并不是唯一一种处理并发的方式，在本系列的下一<br>篇文章中，我将比较一下JavaScript的并发模型与Ruby的MRI技术(通过多线程<br>和GIL)，Ruby的EventMachine技术及Java的多线程技术的并发模型。</p>
+<h2 id="相关阅读"><a href="#相关阅读" class="headerlink" title="相关阅读"></a>相关阅读</h2><ul>
+<li><a href="https://docs.google.com/presentation/d/1KtgaIvDQwMaqZ6ax3zU2oka62sF2ZQSPv1SEirD-XtY/edit?usp=sharing" target="_blank" rel="noopener">The JavaScript Event Loop: Concurrency in the Language of the Web</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/EventLoop" target="_blank" rel="noopener">Concurrency model and Event Loop</a> @ MDN</li>
+<li><a href="http://www.aaronstannard.com/post/2011/12/14/Intro-to-NodeJS-for-NET-Developers.aspx" target="_blank" rel="noopener">An intro to the Node.js platform</a>, by Aaron Stannard</li>
+</ul>
+</section>
+    <p class="post-date">2014 / 03 / 13</p>
+    <!-- Tags START -->
+    
+    <!-- Tags END -->
+    <!-- 打赏 START -->
+    
+    <!-- 打赏 END -->
+    <!-- 二维码 START -->
+    
+    <!-- 二维码 END -->
+    
+      <!-- No Comment -->
+    
+  </article>
+  <!-- Article END -->
+  <!-- Catalog START -->
+  
+    <aside class="catalog-container">
+  <div class="toc-main">
+    <strong class="toc-title">Catalog</strong>
+    
+      <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#目的"><span class="toc-nav-text">目的</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#本文受众"><span class="toc-nav-text">本文受众</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#非阻塞I-O"><span class="toc-nav-text">非阻塞I/O</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#事件循环"><span class="toc-nav-text">事件循环</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#执行消息队列中的回调函数时产生新的消息"><span class="toc-nav-text">执行消息队列中的回调函数时产生新的消息</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#Web-Workers"><span class="toc-nav-text">Web Workers</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#总结"><span class="toc-nav-text">总结</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#相关阅读"><span class="toc-nav-text">相关阅读</span></a></li></ol>
+    
+  </div>
+</aside>
+  
+  <!-- Catalog END -->
+</main>
+
+<script>
+  (function () {
+    var url = 'http://lujingbo.me/the-javascript-event-loop-explained/';
+    var banner = ''
+    if (banner !== '' && banner !== 'undefined' && banner !== 'null') {
+      $('#article-banner').css({
+        'background-image': 'url(' + banner + ')'
+      })
+    } else {
+      $('#article-banner').geopattern(url)
+    }
+    $('.header').removeClass('fixed-header')
+
+     // error image
+    $(".markdown-content img").on('error', function() {
+      $(this).attr('src', 'http://file.muyutech.com/error-img.png')
+      $(this).css({
+        'cursor': 'default'
+      })
+    })
+
+    // zoom image
+    $(".markdown-content img").on('click', function() {
+      var src = $(this).attr('src')
+      if (src !== 'http://file.muyutech.com/error-img.png') {
+        var imageW = $(this).width()
+        var imageH = $(this).height()
+        
+        var zoom = ($(window).width() * 0.95 / imageW).toFixed(2)
+        zoom = zoom < 1 ? 1 : zoom
+        zoom = zoom > 2 ? 2 : zoom
+        var transY = (($(window).height() - imageH) / 2).toFixed(2)
+
+        $('body').append('<div class="image-view-wrap"><div class="image-view-inner"><img src="'+ src +'" /></div></div>')
+        $('.image-view-wrap').addClass('wrap-active')
+        $('.image-view-wrap img').css({
+          'width': `${imageW}`,
+          'transform': `translate3d(0, ${transY}px, 0) scale3d(${zoom}, ${zoom}, 1)`
+        })
+        $('html').css('overflow', 'hidden')
+
+        $('.image-view-wrap').on('click', function() {
+          $(this).remove()
+          $('html').attr('style', '')
+        })
+      }
+    })
+
+  })();
+</script>
+
+    <div class="scroll-top">
+  <span class="arrow-icon"></span>
+</div>
+    <script>
+  function async(u, c) {
+    var d = document, t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+    o.src = u;
+    if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+    s.parentNode.insertBefore(o, s);
+  }
+</script>
+<script>
+  async("//cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+    FastClick.attach(document.body);
+  })
+</script>
+
+<script>
+  var hasLine = 'true';
+  async("//cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js", function(){
+    $('figure pre').each(function(i, block) {
+      var figure = $(this).parents('figure');
+      if (hasLine === 'false') {
+        figure.find('.gutter').hide();
+      }
+      var lang = figure.attr('class').split(' ')[1] || 'code';
+      var codeHtml = $(this).html();
+      var codeTag = document.createElement('code');
+      codeTag.className = lang;
+      codeTag.innerHTML = codeHtml;
+      $(this).attr('class', '').empty().html(codeTag);
+      figure.attr('data-lang', lang.toUpperCase());
+      hljs.highlightBlock(block);
+    });
+  })
+</script>
+<!-- Baidu Tongji -->
+
+<script src="/js/script.js"></script>
+  </body>
+</html>
