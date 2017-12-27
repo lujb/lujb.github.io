@@ -66,7 +66,6 @@
   document.addEventListener('scroll', function () {
     var scrollTop = document.documentElement.scrollTop || document.body.scrollTop
     var headerH = header.height()
-    console.log(scrollTop, headerH)
     if (banner) {
       if (scrollTop > headerH) {
         title.show()

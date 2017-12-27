@@ -3,5 +3,6 @@ _site
 .deploy
 .deploy_git
 .code-highlighter-cache
+db.json
 themes
 node_modules
