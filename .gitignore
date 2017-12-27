@@ -1,5 +1,7 @@
 _site
 .sass-cache
 .deploy
+.deploy_git
 .code-highlighter-cache
+themes
 node_modules
