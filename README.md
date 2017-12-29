@@ -3,8 +3,9 @@
 git clone https://github.com/lujb/lujb.github.io
 cd lujb.github.io
 git checkout source
-mkdir themes
-git clone https://github.com/lujb/hexo-theme-vexo themes/vexo
+git submodule init
+git submodule update
+npm install
 ```
 
 ## Writing
