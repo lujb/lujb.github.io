@@ -4,5 +4,4 @@ _site
 .deploy_git
 .code-highlighter-cache
 db.json
-themes
 node_modules
