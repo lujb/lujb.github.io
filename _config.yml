@@ -77,5 +77,6 @@ theme: vexo
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
+  merge_dir: public-extra
   type: git
   repo: git@github.com:lujb/lujb.github.io.git
