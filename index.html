@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <meta name="description" content="2b or not 2b">
+  <meta name="keyword" content="lujingbo, lujb, javascript">
+  
+    <link rel="shortcut icon" href="/css/images/logo.png">
+  
+  <title>
+    
+      #!/bin/env lujingbo
+    
+  </title>
+  <link href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href="//cdn.bootcss.com/nprogress/0.2.0/nprogress.min.css" rel="stylesheet">
+  <link href="//cdn.bootcss.com/highlight.js/9.12.0/styles/tomorrow.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+  <script src="//cdn.bootcss.com/geopattern/1.2.3/js/geopattern.min.js"></script>
+  <script src="//cdn.bootcss.com/nprogress/0.2.0/nprogress.min.js"></script>
+</head>
+<div class="wechat-share">
+  <img src="/css/images/logo.png" />
+</div>
+
+  <body>
+    <header class="header fixed-header">
+  <div class="header-container">
+    <a class="home-link" href="/">
+      <div class="logo"></div>
+      <span data-title="#!/bin/env lujingbo" data-ptitle="">#!/bin/env lujingbo</span>
+    </a>
+    <ul class="right-list">
+      
+        <li class="list-item">
+          
+            <a href="/" class="item-link active">Home</a>
+          
+        </li>
+      
+    </ul>
+    <div class="menu">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </div>
+    <div class="menu-mask">
+      <ul class="menu-list">
+        
+          <li class="menu-item">
+            
+              <a href="/" class="menu-link mobile-active">Home</a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</header>
+
+    <main class="app-body">
+  
+    <article class="article-card">
+      <h2 class="article-head">
+        <a href="/technical-overview-of-couchdb/">[译] CouchDB 技术概述</a>
+      </h2>
+      <p class="article-date">June 23, 2014</p>
+      
+      <div class="article-summary">
+        
+          原文链接
+Document 存储一个 CouchDB 服务器管理一些有名字的数据库，这些数据库里存储着称为documents的东西。每个 document 在数据库中被有一个唯一的名字，同时，CouchDB 提供了对其进行 reading 和 updating(add, edit, dele ...
+        
+      </div>
+      <a class="more" href="/technical-overview-of-couchdb/">Read more</a>
+    </article>
+  
+    <article class="article-card">
+      <h2 class="article-head">
+        <a href="/the-javascript-event-loop-explained/">[译] 解析JavaScript的事件循环机制</a>
+      </h2>
+      <p class="article-date">March 13, 2014</p>
+      
+      <div class="article-summary">
+        
+          <p><a href="http://blog.carbonfive.com/2013/10/27/the-javascript-event-loop-explained/" target="_blank" rel="noopener">原文链接</a></p>
+<h2 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h2><p>在web浏览器的世界中，JavaScript可以说是无处不在，也正因如此，大部分人对<br>JavaScript的事件驱动(event-driven)模型，以及它与Ruby，Python，<br>Java等语言所使用的请求-响应(request-response)模型的区别或多或少都有一些<br>基本的了解。我将在本文中阐述JavaScript并发(concurrency)模型的一些核心<br>概念，包括事件循环(event-loop)和消息队列(message queue)，以便帮你有更<br>深入的理解。
+        
+      </div>
+      <a class="more" href="/the-javascript-event-loop-explained/">Read more</a>
+    </article>
+  
+    <article class="article-card">
+      <h2 class="article-head">
+        <a href="/learn-ecma262-3rd-edition/">读一读 ECMA262 3rd edition</a>
+      </h2>
+      <p class="article-date">March 3, 2014</p>
+      
+      <div class="article-summary">
+        
+          <h2 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h2><h3 id="Web-Scripting"><a href="#Web-Scripting" class="headerlink" title="Web Scripting"></a>Web Scripting</h3><p>JavaScript是一种在宿主环境中执行计算和操作计算对象的面向对象编程语言。它起初被设计为一种Web scripting language，用来增加网页的交互性，以及执行一些服务端的计算。ECMAScript规范描述了其在宿主环境中的core scripting能力。<br>Web浏览器为javascript提供了作为客户端计算的宿主环境。它提供了一些对象用来表示windows, menus, pop-ups, dialog boxes, text areas, anchors, frames, history, cookies, 以及input/output。并且，这个宿主环境也提供了一种手段用来将scripting code绑定到一些事件上。例如，change of focus, page and image loading, unloading, error and abort, selection, form submission, 以及mouse actions。Scripting code嵌入在HTML代码当中，显示出来的页面由一些用户界面元素和一些固定位置并已计算好的文本和图像构成。Scripting code在用户的交互下会被触发执行，而不需要一个main程序去触发。<br>而Web服务器为javascript提供了另一中作为服务端计算的宿主环境(如node.js)。它提供了一些对象用来表示requests, clients, 以及files。它也提供一种机制来锁住或共享数据。
+        
+      </div>
+      <a class="more" href="/learn-ecma262-3rd-edition/">Read more</a>
+    </article>
+  
+
+  
+</main>
+
+
+    <div class="scroll-top">
+  <span class="arrow-icon"></span>
+</div>
+    <script>
+  function async(u, c) {
+    var d = document, t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+    o.src = u;
+    if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+    s.parentNode.insertBefore(o, s);
+  }
+</script>
+<script>
+  async("//cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+    FastClick.attach(document.body);
+  })
+</script>
+
+<script>
+  var hasLine = 'true';
+  async("//cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js", function(){
+    $('figure pre').each(function(i, block) {
+      var figure = $(this).parents('figure');
+      if (hasLine === 'false') {
+        figure.find('.gutter').hide();
+      }
+      var lang = figure.attr('class').split(' ')[1] || 'code';
+      var codeHtml = $(this).html();
+      var codeTag = document.createElement('code');
+      codeTag.className = lang;
+      codeTag.innerHTML = codeHtml;
+      $(this).attr('class', '').empty().html(codeTag);
+      figure.attr('data-lang', lang.toUpperCase());
+      hljs.highlightBlock(block);
+    });
+  })
+</script>
+<!-- Baidu Tongji -->
+
+<script src="/js/script.js"></script>
+  </body>
+</html>
